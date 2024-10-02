@@ -1,8 +1,11 @@
+import LoginForm from "@/components/LoginForm"
 
-const AuthLoginPage = () => {
+const LoginPage = () => {
   return (
-    <div>AuthLoginPage</div>
+    <>
+      <LoginForm/>
+    </>
   )
 }
 
-export default AuthLoginPage
+export default LoginPage

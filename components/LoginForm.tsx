@@ -11,10 +11,11 @@ import { Button } from "./ui/button";
 import FormError from "./formError";
 import { login } from "@/actions/login";
 import { useTransition } from "react";
+import toast from "react-hot-toast";
 
 const LoginForm = () => {
   const [isPending,startTransition] = useTransition();
-
+  
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues:{
@@ -22,10 +23,20 @@ const LoginForm = () => {
       password:''
     }
   })
+  const {isSubmitting,errors} = form.formState;
   const onSubmit = async (values:z.infer<typeof loginSchema>)=>{
-    // startTransition(async ()=>{
-    //   await login(values)
-    // })
+    try{
+      startTransition(async ()=>{
+        await login(values).then((data)=>{
+          const message = data?.success || 'something went wrong';
+          toast.success(message)
+        })
+      });
+      
+    }catch(error){
+      console.error(error);
+    
+    }
   }
   return (
     <CardWrapper backButtonHref="/auth/register" backButtonLabel="Don't have an account" headerLabel="Welcome back" showSocial>
@@ -52,8 +63,8 @@ const LoginForm = () => {
             )}/>
 
           </div>
-          <FormError message="Something went wrong"/>
-          <Button type="submit" disabled={isPending} className="w-full">Login</Button>
+          {(errors?.email || errors?.password) &&  <FormError message="Something went wrong"/>}
+          <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? 'login...' :'Login'}</Button>
         </form>
       </Form>
     </CardWrapper>
